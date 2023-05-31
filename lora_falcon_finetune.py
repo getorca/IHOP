@@ -57,7 +57,7 @@ class DataArguments:
 @dataclass
 class TrainingArguments(TrainingArguments):
     output_dir: str = field(
-        default=f'finetunes/{str(dt.datetime.now())}',
+        default=f'finetunes/{str(dt.now())}',
         metadata={"help": "The output directory where the model predictions and checkpoints will be written."}
     )            
     optim: str = field(
