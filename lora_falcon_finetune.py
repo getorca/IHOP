@@ -1,4 +1,4 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM, Trainer, DataCollatorForLanguageModeling, TrainingArguments, HfArgumentParser
+from transformers import AutoTokenizer, AutoModelForCausalLM, Trainer, DataCollatorForLanguageModeling, TrainingArguments, HfArgumentParser, BitsAndBytesConfig
 from datasets import load_dataset
 from typing import Dict, Optional, Sequence, List
 from dataclasses import dataclass, field
@@ -27,7 +27,8 @@ class LoraArguments:
         metadata={"help": "Dropout for probability for the Lora layer."}
     )
     lora_target_modules: List[str] = field(
-        default_factory=lambda: ['q_proj','k_proj','v_proj','o_proj'],
+        # default_factory=lambda: ['query_key_value', 'dense'],
+        default_factory=lambda: ['query_key_value'],
         metadata={"help": "which weight matrices to adapt. The paper argues more matricies with lower ranks."}
     )
     bias: str = field(
@@ -38,7 +39,7 @@ class LoraArguments:
 
 @dataclass
 class ModelArguments:
-    base_model: Optional[str] = field(default="tiiuae/falcon-7b")
+    base_model: Optional[str] = field(default="/home/llmadmin/models/falcon-7b")
 
 
 @dataclass
@@ -61,7 +62,7 @@ class TrainingArguments(TrainingArguments):
         metadata={"help": "The output directory where the model predictions and checkpoints will be written."}
     )            
     optim: str = field(
-        default="adamw_torch"
+        default="paged_adamw_32bit"
     )
     model_max_length: int = field(
         default=2048,
@@ -78,19 +79,19 @@ class TrainingArguments(TrainingArguments):
         metadata={"help": "Whether to use fp16 16-bit (mixed) precision training instead of 32-bit training"},
     )
     local_rank: int = field(default=0) # for DDP
-    learning_rate: float = field(default=3e-4)
-    per_device_train_batch_size: int = 8
-    gradient_accumulation_steps: int = 4,
-    warmup_ratio: float = 0.05,
-    num_train_epochs: int = 3,
-    logging_steps: int = 200,
-    evaluation_strategy: str = "steps",
-    save_strategy: str = "steps",
+    learning_rate: float = field(default=2e-4)
+    per_device_train_batch_size: int = 1
+    gradient_accumulation_steps: int = 1
+    warmup_ratio: float = 0.05
+    num_train_epochs: int = 3
+    logging_steps: int = 200
+    evaluation_strategy: str = 'steps'
+    save_strategy: str = 'steps'
     eval_steps: int = 200
-    save_steps: int = 200,
-    save_total_limit: int = 3,
-    load_best_model_at_end: bool = True,
-    ddp_find_unused_parameters: bool = False,
+    save_steps: int = 200
+    save_total_limit: int = 3
+    load_best_model_at_end: bool = True
+    ddp_find_unused_parameters: bool = False
 
 
 
@@ -126,7 +127,17 @@ def train():
     
     model = AutoModelForCausalLM.from_pretrained(
         model_args.base_model,
-        load_in_8bit=True,
+        load_in_4bit=True,
+        load_in_8bit=False,
+        quantization_config=BitsAndBytesConfig(
+            load_in_4bit=True,
+            load_in_8bit=False,
+            llm_int8_threshold=6.0,
+            llm_int8_has_fp16_weight=False,
+            bnb_4bit_compute_dtype=torch.float16,
+            bnb_4bit_use_double_quant=True,
+            bnb_4bit_quant_type='nf4'
+        ),
         torch_dtype=torch.float16,
         trust_remote_code=True,
         device_map = {"": int(os.environ.get("LOCAL_RANK") or 0)}  # this is for DDP to use 1 GPU per process
@@ -144,10 +155,10 @@ def train():
     )
     model = get_peft_model(model, lora_config)
     
-    model.print_trainable_parameters()
+    # model.print_trainable_parameters()
     
     tokenizer = AutoTokenizer.from_pretrained(
-        model, 
+        model_args.base_model, 
         add_eos_token=True,
     )
     tokenizer.pad_token = tokenizer.eos_token
@@ -182,3 +193,7 @@ def train():
     trainer.save_state()
 
     model.save_pretrained(training_args.output_dir)
+
+
+if __name__ == "__main__":
+    train()
