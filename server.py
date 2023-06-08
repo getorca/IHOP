@@ -8,6 +8,7 @@ from peft import PeftModel
 from dataclasses import dataclass, asdict, field
 from enum import Enum
 from sanic_ext import validate
+from typing import Optional
 
 
 
@@ -29,6 +30,7 @@ class MessageRoles(Enum):
 class Message:
     role: str
     content: str
+    name: Optional[str] = None
     
     def __post_init__(self):
         # validate role
@@ -64,21 +66,6 @@ def load_model(app, loop):
         torch_dtype=torch.bfloat16,
     )
     
-
-
-
-
-
-# @app.listener("main_process_start")
-# async def listener_1(app, loop):
-#     app.ctx.model, app.ctx.tokenizer = await load_model()
-#     print("listener_0")
-
-# @app.listener("before_server_start")
-# async def listener_1(app, loop):
-#     print("listener_1")
-        
-# app.add_task(infer_generate, name='infer_generate')
     
 @app.post("/chat")
 @validate(json=ChatRequest)
@@ -109,5 +96,7 @@ async def chat_request(request, body: ChatRequest):
             pad_token_id=app.ctx.tokenizer.eos_token_id  
         )
     )
+    
     response = await extract_response(app.ctx.tokenizer.decode(generation_output[0]))
+    
     return text(response)
