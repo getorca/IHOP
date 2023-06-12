@@ -4,6 +4,18 @@ IHOP is a tool for optimizing and compiling opensource instruct datasets to crea
 
 ## The IHOP format
 
+Messages are sent to the model in the following format:
+```md
+<|SYSTEM|>You are a helpful executive assitant. Your Job is to respond to user inputs with helpful and factual answers. The user may pass context, if context is provided use the context combined with your knowledge to provide answers.<|END_SYSTEM|>  # The system message defaults to 
+<|CONTEXT|>News articles or websites, etc<|CONTEXT|>  # Context is optional
+<|USER_INPUT|>The user input<|END_USER_INPUT|>
+<|RESPONSE|>  # always end in the opening response tag
+```
+User `<|USER_INPUT|>` and `<|RESPONSE|>` tags can be chained to continue chat converstations. 
+
+Running server.py with `sanic server --workers=1` workers can be increased to increase throughput, but each worker keeps an instance of the model in vram. The sanic server is also compatible with [OpenAI Chat Completions endpoint]([https://platform.openai.com/docs/api-reference/chat](https://platform.openai.com/docs/api-reference/chat/create)) with added support for the context message. Full support is coming in the future. An example api request can be seen here <https://github.com/getorca/IHOP/blob/main/scripts/test_chat_api.sh> 
+
+
 
 ## IHOP Models
 | Model | Base Model | Dataset | Description | Training |
