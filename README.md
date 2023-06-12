@@ -2,6 +2,20 @@
 
 IHOP is a tool for optimizing and compiling opensource instruct datasets to create better finetunings for large language models. 
 
+## The IHOP format
+
+
+## IHOP Models
+| Model | Base Model | Dataset | Description | Training |
+|-------|------------|---------| -------- | ---- |
+| [IHOPv01_Falcon7b_lora](https://huggingface.co/winddude/IHOPv01_Falcon7b_lora) | Falcon 7b | [IHOPv01](https://huggingface.co/datasets/winddude/IHOPv01) | An experimental general purpose instruct following chat model | This repo |
+| [pb_lora_7b_v0.1](https://huggingface.co/winddude/pb_lora_7b_v0.1) | llama 7b | [reddit_finance_43_250k](https://huggingface.co/datasets/winddude/reddit_finance_43_250k) | An experimental model trained to reply to various finance, crypto and investing subreddits | [Training](https://github.com/getorca/ProfitsBot_V0_OLLM/blob/main/training) |
+
+## IHOP Datasets
+
+| Dataset | Size | Source | Description | Recreation |
+|---------|------|--------|-------------|------------|
+| [IHOPv01](https://huggingface.co/datasets/winddude/IHOPv01) | 67.4k | composite | A collecton of instruct datasets, curated to not reject instructions | [Building](https://github.com/getorca/IHOP/tree/main/notebooks) |
 
 ## Run training
 
