@@ -13,11 +13,10 @@ Messages are sent to the model in the following format:
 ```
 User `<|USER_INPUT|>` and `<|RESPONSE|>` tags can be chained to continue chat converstations. 
 
-Running server.py with `sanic server --workers=1` workers can be increased to increase throughput, but each worker keeps an instance of the model in vram. The sanic server is also compatible with [OpenAI Chat Completions endpoint]([https://platform.openai.com/docs/api-reference/chat](https://platform.openai.com/docs/api-reference/chat/create)) with added support for the context message. Full support is coming in the future. An example api request can be seen here <https://github.com/getorca/IHOP/blob/main/scripts/test_chat_api.sh> 
-
-
+Running server.py with `sanic server --workers=1` workers can be increased to increase throughput, but each worker keeps an instance of the model in vram. The sanic server is also compatible with [OpenAI Chat Completions endpoint](https://platform.openai.com/docs/api-reference/chat/create) with added support for the context message. Full support is coming in the future. An example api request can be seen here <https://github.com/getorca/IHOP/blob/main/scripts/test_chat_api.sh>. The API response is raw text of only the response.
 
 ## IHOP Models
+
 | Model | Base Model | Dataset | Description | Training |
 |-------|------------|---------| -------- | ---- |
 | [IHOPv01_Falcon7b_lora](https://huggingface.co/winddude/IHOPv01_Falcon7b_lora) | Falcon 7b | [IHOPv01](https://huggingface.co/datasets/winddude/IHOPv01) | An experimental general purpose instruct following chat model | This repo |
