@@ -4,13 +4,15 @@ This is a series of scripts for recreating the FLAN datasets that are "FLANesque
 
 ## Usage
 
-Download the dataset @ <https://huggingface.co/datasets/winddude/IHOP_flan_CoT>
-
-Install Polars `pip install polars` or install the requirements.txt located in the parent folder.
-
 So far only FLAN CoT has been implemented.
 
-Recreate the dataset with the code in `ihop_flan_cot.ipynb` in this directory. Just run all the cells. 
+Download the dataset @ <https://huggingface.co/datasets/winddude/IHOP_flan_CoT>
+
+### Recreate from scratch
+
+1) Clone this repo. Will need git LFS.
+2) Install Polars `pip install polars` or install the requirements.txt located in the parent folder.
+3) Recreate the dataset with the code in `ihop_flan_cot.ipynb` in this directory. Just run all the cells.
 
 ## Why recreate FLAN?
 
